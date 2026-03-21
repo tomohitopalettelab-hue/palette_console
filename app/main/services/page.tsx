@@ -4,30 +4,73 @@ import { useEffect, useState } from 'react';
 import { X, ExternalLink, Globe, Film, PenTool, Megaphone, Star, Palette } from 'lucide-react';
 
 type Session = { paletteId: string };
-type ServiceTab = {
+
+type ServiceInfo = {
   key: string;
   label: string;
+  description: string;
   icon: React.ElementType;
+  color: string;
+  bgColor: string;
   url: string;
 };
 
-const ALL_SERVICES: Omit<ServiceTab, 'url'>[] = [
-  { key: 'pal_studio', label: 'Web制作', icon: Globe },
-  { key: 'pal_base', label: '販促ツール', icon: Palette },
-  { key: 'pal_video', label: '動画制作', icon: Film },
-  { key: 'pal_opt', label: 'マーケティング', icon: PenTool },
-  { key: 'pal_ad', label: '広告運用', icon: Megaphone },
-  { key: 'pal_trust', label: '顧客評価', icon: Star },
+const ALL_SERVICES: ServiceInfo[] = [
+  {
+    key: 'pal_studio',
+    label: 'pal_studio',
+    description: 'Web制作 — AIでプロ品質のWebサイトを構築',
+    icon: Globe,
+    color: '#3B82F6',
+    bgColor: 'rgba(59,130,246,0.1)',
+    url: 'https://pal-studio.vercel.app/main',
+  },
+  {
+    key: 'pal_base',
+    label: 'pal_base',
+    description: '販促ツール — クーポン・バナー・リッチメニュー生成',
+    icon: Palette,
+    color: '#8CC63F',
+    bgColor: 'rgba(140,198,63,0.1)',
+    url: 'https://pal-base.vercel.app/main',
+  },
+  {
+    key: 'pal_video',
+    label: 'pal_video',
+    description: '動画制作 — AIで販促動画を自動生成',
+    icon: Film,
+    color: '#F97316',
+    bgColor: 'rgba(249,115,22,0.1)',
+    url: 'https://pal-video.vercel.app/main',
+  },
+  {
+    key: 'pal_opt',
+    label: 'pal_opt',
+    description: 'マーケティング — Instagram・Blog・GBP投稿管理',
+    icon: PenTool,
+    color: '#A855F7',
+    bgColor: 'rgba(168,85,247,0.1)',
+    url: 'https://pal-opt.vercel.app/main',
+  },
+  {
+    key: 'pal_ad',
+    label: 'pal_ad',
+    description: '広告運用 — マルチチャネル広告管理',
+    icon: Megaphone,
+    color: '#EF4444',
+    bgColor: 'rgba(239,68,68,0.1)',
+    url: 'https://pal-ad.vercel.app/main',
+  },
+  {
+    key: 'pal_trust',
+    label: 'pal_trust',
+    description: '顧客評価 — アンケート・フィードバック収集',
+    icon: Star,
+    color: '#EAB308',
+    bgColor: 'rgba(234,179,8,0.1)',
+    url: 'https://www.pal-trust.com/main',
+  },
 ];
-
-const SERVICE_URLS: Record<string, string> = {
-  pal_studio: 'http://localhost:3000/main',
-  pal_base: 'http://localhost:3105/main',
-  pal_video: 'http://localhost:3103/main',
-  pal_opt: 'http://localhost:3104/main',
-  pal_ad: 'http://localhost:3105/main',
-  pal_trust: 'http://localhost:3000/main',
-};
 
 export default function ServicesPage() {
   const [subscribedServices, setSubscribedServices] = useState<string[]>([]);
@@ -66,6 +109,9 @@ export default function ServicesPage() {
     }
   };
 
+  const getServiceInfo = (key: string): ServiceInfo | undefined =>
+    ALL_SERVICES.find((s) => s.key === key);
+
   const availableServices = ALL_SERVICES.filter((s) => subscribedServices.includes(s.key));
 
   return (
@@ -84,7 +130,7 @@ export default function ServicesPage() {
           サービス一覧
         </button>
         {openTabs.map((key) => {
-          const svc = ALL_SERVICES.find((s) => s.key === key);
+          const svc = getServiceInfo(key);
           if (!svc) return null;
           const Icon = svc.icon;
           return (
@@ -94,11 +140,11 @@ export default function ServicesPage() {
               className="flex items-center gap-2 px-4 py-3 text-sm whitespace-nowrap cursor-pointer transition-colors"
               style={{
                 background: activeTab === key ? 'var(--bg-primary)' : 'transparent',
-                color: activeTab === key ? 'var(--text-primary)' : 'var(--text-muted)',
-                borderBottom: activeTab === key ? '2px solid var(--text-primary)' : '2px solid transparent',
+                color: activeTab === key ? svc.color : 'var(--text-muted)',
+                borderBottom: activeTab === key ? `2px solid ${svc.color}` : '2px solid transparent',
               }}
             >
-              <Icon size={14} />
+              <Icon size={14} style={{ color: svc.color }} />
               {svc.label}
               <button
                 onClick={(e) => closeTab(key, e)}
@@ -131,20 +177,24 @@ export default function ServicesPage() {
                     <button
                       key={svc.key}
                       onClick={() => openService(svc.key)}
-                      className="glass-card p-5 text-left flex items-center justify-between group"
+                      className="glass-card p-5 text-left group"
+                      style={{ borderLeft: `3px solid ${svc.color}` }}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-input)' }}>
-                          <Icon size={20} style={{ color: 'var(--text-secondary)' }} />
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: svc.bgColor }}>
+                            <Icon size={20} style={{ color: svc.color }} />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold" style={{ color: svc.color }}>{svc.label}</h3>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{svc.label}</h3>
-                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                            {isOpen ? 'タブで開いています' : '管理画面を開く'}
-                          </p>
-                        </div>
+                        <ExternalLink size={16} style={{ color: 'var(--text-muted)' }} />
                       </div>
-                      <ExternalLink size={16} style={{ color: 'var(--text-muted)' }} />
+                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{svc.description}</p>
+                      {isOpen && (
+                        <p className="text-xs mt-2" style={{ color: svc.color }}>タブで開いています</p>
+                      )}
                     </button>
                   );
                 })}
@@ -152,10 +202,9 @@ export default function ServicesPage() {
             )}
           </div>
         ) : (
-          // iframe for active service
           <iframe
             key={activeTab}
-            src={SERVICE_URLS[activeTab] || ''}
+            src={getServiceInfo(activeTab)?.url || ''}
             className="w-full h-full border-0"
             style={{ minHeight: 'calc(100vh - 110px)' }}
             title={activeTab}
