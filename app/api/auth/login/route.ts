@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SESSION_COOKIE, SESSION_TTL_MS, createSessionValue } from '@/lib/auth-session';
-import { palDbPost } from '@/lib/pal-db-client';
+import { palDbPost, palDbGet } from '@/lib/pal-db-client';
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,6 +32,26 @@ export async function POST(req: NextRequest) {
     const account = await dbRes.json();
     const paletteId = account.paletteId || account.palette_id || '';
     const customerId = account.id || '';
+
+    // Check if the customer has an active palette_console subscription
+    try {
+      const subsRes = await palDbGet(`/api/service-subscriptions?paletteId=${paletteId}`);
+      if (subsRes.ok) {
+        const subsData = await subsRes.json();
+        const subs = Array.isArray(subsData) ? subsData : subsData.subscriptions || [];
+        const hasConsole = subs.some(
+          (s: Record<string, unknown>) =>
+            (String(s.service_key || s.serviceKey || '').toLowerCase().includes('console') ||
+             String(s.service_key || s.serviceKey || '').toLowerCase() === 'palette_console') &&
+            s.status === 'active',
+        );
+        if (!hasConsole) {
+          return NextResponse.json({ error: 'Palette Consoleのご契約がありません' }, { status: 403 });
+        }
+      }
+    } catch {
+      // If subscription check fails, allow login (graceful degradation)
+    }
 
     const session = createSessionValue({
       role: 'customer',
