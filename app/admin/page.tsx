@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { RefreshCw, Search, ChevronRight, Globe, Film, PenTool, Megaphone, Star, Palette, Building2 } from 'lucide-react';
 
 type Customer = {
@@ -42,6 +43,7 @@ const SERVICE_SHORT: Record<string, string> = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -123,7 +125,7 @@ export default function AdminPage() {
           </div>
         ) : (
           filtered.map((c) => (
-            <div key={c.paletteId} className="glass-card p-4">
+            <div key={c.paletteId} className="glass-card p-4 cursor-pointer" onClick={() => router.push(`/admin/customers/${c.paletteId}`)}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div
