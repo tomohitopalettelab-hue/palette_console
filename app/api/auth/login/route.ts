@@ -33,24 +33,28 @@ export async function POST(req: NextRequest) {
     const paletteId = account.paletteId || account.palette_id || '';
     const customerId = account.id || '';
 
-    // Check if the customer has an active palette_console subscription
+    // Check if the customer has a palette_console contract (via palette-summary)
     try {
-      const subsRes = await palDbGet(`/api/service-subscriptions?paletteId=${paletteId}`);
-      if (subsRes.ok) {
-        const subsData = await subsRes.json();
-        const subs = Array.isArray(subsData) ? subsData : subsData.subscriptions || [];
-        const hasConsole = subs.some(
-          (s: Record<string, unknown>) =>
-            (String(s.service_key || s.serviceKey || '').toLowerCase().includes('console') ||
-             String(s.service_key || s.serviceKey || '').toLowerCase() === 'palette_console') &&
-            s.status === 'active',
+      const summaryRes = await palDbGet(`/api/palette-summary?paletteId=${paletteId}`);
+      if (summaryRes.ok) {
+        const summary = await summaryRes.json();
+        const contracts = summary.contracts || [];
+        const plans = summary.plans || [];
+        const planCodes = new Set(plans.map((p: Record<string, unknown>) => String(p.code || '')));
+        const consolePlanIds = new Set(
+          plans
+            .filter((p: Record<string, unknown>) => String(p.code || '').includes('console'))
+            .map((p: Record<string, unknown>) => String(p.id || '')),
+        );
+        const hasConsole = contracts.some(
+          (c: Record<string, unknown>) => consolePlanIds.has(String(c.planId || c.plan_id || '')),
         );
         if (!hasConsole) {
           return NextResponse.json({ error: 'Palette Consoleのご契約がありません' }, { status: 403 });
         }
       }
     } catch {
-      // If subscription check fails, allow login (graceful degradation)
+      // If check fails, allow login (graceful degradation)
     }
 
     const session = createSessionValue({
