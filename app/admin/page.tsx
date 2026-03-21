@@ -23,14 +23,22 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
 };
 
 const SERVICE_SHORT: Record<string, string> = {
-  pal_studio: 'Studio',
-  pal_base: 'Base',
-  pal_video: 'Video',
-  pal_opt: 'Opt',
-  pal_ad: 'Ad',
-  pal_trust: 'Trust',
-  palette_ai: 'AI',
-  palette_console: 'Console',
+  pal_studio: 'pal_studio',
+  pal_studio_lite: 'pal_studio',
+  pal_studio_standard: 'pal_studio',
+  pal_studio_pro: 'pal_studio',
+  pal_base: 'pal_base',
+  pal_video: 'pal_video',
+  pal_video_lite: 'pal_video',
+  pal_video_standard: 'pal_video',
+  pal_video_pro: 'pal_video',
+  pal_opt: 'pal_opt',
+  pal_opt_lite: 'pal_opt',
+  pal_opt_standard: 'pal_opt',
+  pal_ad: 'pal_ad',
+  pal_trust: 'pal_trust',
+  palette_ai: 'palette_ai',
+  palette_console: 'palette_console',
 };
 
 export default function AdminPage() {
@@ -148,13 +156,13 @@ export default function AdminPage() {
                     </div>
                     {/* Services */}
                     <div className="flex items-center gap-1 mt-2 flex-wrap">
-                      {c.services.filter((s) => s !== 'palette_console').map((s) => (
+                      {[...new Set(c.services.filter((s) => s !== 'palette_console').map((s) => SERVICE_SHORT[s] || s))].map((label) => (
                         <span
-                          key={s}
+                          key={label}
                           className="text-xs px-1.5 py-0.5 rounded"
                           style={{ background: 'var(--border-primary)', color: 'var(--text-muted)' }}
                         >
-                          {SERVICE_SHORT[s] || s}
+                          {label}
                         </span>
                       ))}
                     </div>

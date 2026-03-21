@@ -22,14 +22,14 @@ type AnalyticsData = {
 };
 
 const SERVICE_LABELS: Record<string, string> = {
-  pal_studio: 'Web制作',
-  pal_base: '販促ツール',
-  pal_video: '動画制作',
-  pal_opt: 'マーケティング',
-  pal_ad: '広告運用',
-  pal_trust: '顧客評価',
-  palette_ai: 'AI チャット',
-  palette_console: 'Console',
+  pal_studio: 'pal_studio',
+  pal_base: 'pal_base',
+  pal_video: 'pal_video',
+  pal_opt: 'pal_opt',
+  pal_ad: 'pal_ad',
+  pal_trust: 'pal_trust',
+  palette_ai: 'palette_ai',
+  palette_console: 'palette_console',
 };
 
 export default function AdminAnalyticsPage() {
