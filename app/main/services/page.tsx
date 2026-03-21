@@ -12,63 +12,63 @@ type ServiceInfo = {
   icon: React.ElementType;
   color: string;
   bgColor: string;
-  url: string;
+  baseUrl: string;
 };
 
 const ALL_SERVICES: ServiceInfo[] = [
   {
     key: 'pal_studio',
-    label: 'pal_studio',
+    label: 'Pal Studio',
     description: 'Web制作 — AIでプロ品質のWebサイトを構築',
     icon: Globe,
     color: '#3B82F6',
     bgColor: 'rgba(59,130,246,0.1)',
-    url: 'https://pal-studio.vercel.app/main',
+    baseUrl: 'https://pal-studio.vercel.app',
   },
   {
     key: 'pal_base',
-    label: 'pal_base',
+    label: 'Pal Base',
     description: '販促ツール — クーポン・バナー・リッチメニュー生成',
     icon: Palette,
     color: '#8CC63F',
     bgColor: 'rgba(140,198,63,0.1)',
-    url: 'https://pal-base.vercel.app/main',
+    baseUrl: 'https://pal-base.vercel.app',
   },
   {
     key: 'pal_video',
-    label: 'pal_video',
+    label: 'Pal Video',
     description: '動画制作 — AIで販促動画を自動生成',
     icon: Film,
     color: '#F97316',
     bgColor: 'rgba(249,115,22,0.1)',
-    url: 'https://pal-video.vercel.app/main',
+    baseUrl: 'https://pal-video.vercel.app',
   },
   {
     key: 'pal_opt',
-    label: 'pal_opt',
+    label: 'Pal Opt',
     description: 'マーケティング — Instagram・Blog・GBP投稿管理',
     icon: PenTool,
     color: '#A855F7',
     bgColor: 'rgba(168,85,247,0.1)',
-    url: 'https://pal-opt.vercel.app/main',
+    baseUrl: 'https://pal-opt.vercel.app',
   },
   {
     key: 'pal_ad',
-    label: 'pal_ad',
+    label: 'Pal Ad',
     description: '広告運用 — マルチチャネル広告管理',
     icon: Megaphone,
     color: '#EF4444',
     bgColor: 'rgba(239,68,68,0.1)',
-    url: 'https://pal-ad.vercel.app/main',
+    baseUrl: 'https://pal-ad.vercel.app',
   },
   {
     key: 'pal_trust',
-    label: 'pal_trust',
+    label: 'Pal Trust',
     description: '顧客評価 — アンケート・フィードバック収集',
     icon: Star,
     color: '#EAB308',
     bgColor: 'rgba(234,179,8,0.1)',
-    url: 'https://www.pal-trust.com/main',
+    baseUrl: 'https://www.pal-trust.com',
   },
 ];
 
@@ -77,6 +77,7 @@ export default function ServicesPage() {
   const [openTabs, setOpenTabs] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [ssoToken, setSsoToken] = useState<string>('');
 
   useEffect(() => {
     fetch('/api/auth/session')
@@ -91,7 +92,20 @@ export default function ServicesPage() {
         if (data.subscribedServices) setSubscribedServices(data.subscribedServices);
       })
       .catch(() => {});
+
+    // Get SSO token for iframe auth
+    fetch('/api/console/sso-token')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.token) setSsoToken(data.token);
+      })
+      .catch(() => {});
   }, []);
+
+  const buildServiceUrl = (svc: ServiceInfo): string => {
+    const url = `${svc.baseUrl}/api/console-sso?token=${encodeURIComponent(ssoToken)}&redirect=/main`;
+    return url;
+  };
 
   const openService = (key: string) => {
     if (!openTabs.includes(key)) {
@@ -185,9 +199,7 @@ export default function ServicesPage() {
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: svc.bgColor }}>
                             <Icon size={20} style={{ color: svc.color }} />
                           </div>
-                          <div>
-                            <h3 className="text-sm font-bold" style={{ color: svc.color }}>{svc.label}</h3>
-                          </div>
+                          <h3 className="text-sm font-bold" style={{ color: svc.color }}>{svc.label}</h3>
                         </div>
                         <ExternalLink size={16} style={{ color: 'var(--text-muted)' }} />
                       </div>
@@ -204,7 +216,7 @@ export default function ServicesPage() {
         ) : (
           <iframe
             key={activeTab}
-            src={getServiceInfo(activeTab)?.url || ''}
+            src={getServiceInfo(activeTab) ? buildServiceUrl(getServiceInfo(activeTab)!) : ''}
             className="w-full h-full border-0"
             style={{ minHeight: 'calc(100vh - 110px)' }}
             title={activeTab}
