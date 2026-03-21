@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>#000 Black Palette Console</title>
+    <style>
+        :root {
+            /* ベースカラー */
+            --color-black: #000000; /* 純黒 */
+            --color-white: #FFFFFF;
+            --text-main: #333333;
+            --text-sub: #666666;
+            
+            /* アクセントカラー（明るく調整） */
+            --color-magenta: #FF7EDF;
+            --color-turquoise: #4FDFFF;
+            --color-lime: #A5FF6F;
+            --color-gold: #FFE082;
+            --color-orange: #FFB74D;
+            --color-coral: #FF8A80;
+            
+            /* 透明感（グラスモーフィズム）の設定 */
+            --glass-bg: rgba(255, 255, 255, 0.6); /* 白の透明 */
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            --blur-val: blur(10px);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%); /* 爽やかな背景 */
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ★サイドバーを漆黒に（アクセント） */
+        .sidebar {
+            width: 260px;
+            background: var(--color-black);
+            color: var(--color-white);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .logo-area {
+            padding: 40px 25px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .logo-area span {
+            font-size: 0.8rem;
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: normal;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-white);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--color-white);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+        }
+
+        /* メインコンテンツ */
+        .main-container {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-text h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .welcome-text p {
+            margin: 5px 0 0 0;
+            color: var(--text-sub);
+        }
+
+        /* 契約サービス（上部・透明感を維持） */
+        .service-status-bar {
+            background: var(--glass-bg);
+            backdrop-filter: var(--blur-val);
+            -webkit-backdrop-filter: var(--blur-val);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        .status-item {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+            text-align: center;
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-item.active {
+            opacity: 1;
+        }
+
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.05); /* 薄い黒グレー */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* 契約中の光るエフェクト */
+        .status-item.active .status-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            filter: blur(8px);
+            opacity: 0.7;
+            z-index: -1;
+        }
+
+        .status-name {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .status-desc {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+        }
+
+        /* AI チャットエリア（スマホのメイン画面） */
+        .ai-chat-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* ★AIチャットウィンドウを漆黒に（アクセント） */
+        .ai-chat-window {
+            flex: 2;
+            background: var(--color-black);
+            color: var(--color-white);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .ai-robot-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .ai-name h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--color-white);
+        }
+
+        .ai-name p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #2ecc71; /* オンライングリーン */
+            font-weight: bold;
+        }
+
+        .chat-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* AIの吹き出し（白系） */
+        .message.ai {
+            align-self: flex-start;
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .message.ai .bubble {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.9);
+            padding: 15px 20px;
+            border-radius: 20px 20px 20px 5px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* ユーザーの吹き出し（グレー） */
+        .message.user {
+            align-self: flex-end;
+            max-width: 80%;
+        }
+
+        .message.user .bubble {
+            background: #333;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 20px 20px 5px 20px;
+            font-size: 0.95rem;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: var(--color-white);
+            font-size: 0.9rem;
+        }
+        .chat-input::placeholder { color: rgba(255,255,255,0.75); }
+
+        .send-btn {
+            background: var(--color-white);
+            color: var(--color-black);
+            border: none;
+            padding: 0 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 右側のクイックアクション（透明感を維持） */
+        .quick-actions {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--blur-val);
+            -webkit-backdrop-filter: var(--blur-val);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .action-card h3 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+        }
+
+        .action-card p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            #000 Black Palette
+            <span>管理画面</span>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-item active">今の状況を見る</div>
+            <div class="nav-item">詳しく分析する</div>
+            <div class="nav-item">設定を変える</div>
+            <div class="nav-item">使い方・相談</div>
+        </nav>
+    </aside>
+
+    <main class="main-container">
+        
+        <header class="header-area">
+            <div class="welcome-text">
+                <h1>こんにちは！</h1>
+                <p>今日のあなたのお店のご様子です。</p>
+            </div>
+        </header>
+
+        <section class="service-status-bar">
+            <div class="status-item active">
+                <div class="status-icon" style="background-color: var(--color-white); border: 1px solid #ccc; color: #333;" role="img" aria-label="AI知能のステータスアイコン">🧠</div>
+                <div class="status-name">AI知能</div>
+                <div class="status-desc">White Palette</div>
+            </div>
+
+            <div class="status-item active">
+                <div class="status-icon" style="background-color: var(--color-magenta); color: #fff;" role="img" aria-label="お店の運用状況を表すステータスアイコン">📈</div>
+                <div class="status-name">お店の運用</div>
+                <div class="status-desc">Pal-Opt</div>
+            </div>
+
+            <div class="status-item active">
+                <div class="status-icon" style="background-color: var(--color-turquoise); color: #fff;" role="img" aria-label="ホームページに関するステータスアイコン">💻</div>
+                <div class="status-name">ホームページ</div>
+                <div class="status-desc">Pal-Studio</div>
+            </div>
+
+            <div class="status-item">
+                <div class="status-icon" role="img" aria-label="集客の土台を表すステータスアイコン">🚩</div>
+                <div class="status-name">集客の土台</div>
+                <div class="status-desc">Pal-Base</div>
+            </div>
+
+            <div class="status-item">
+                <div class="status-icon" role="img" aria-label="口コミ・評判を表すステータスアイコン">🤝</div>
+                <div class="status-name">口コミ・評判</div>
+                <div class="status-desc">Pal-Trust</div>
+            </div>
+
+            <div class="status-item">
+                <div class="status-icon" role="img" aria-label="広告配信を表すステータスアイコン">📢</div>
+                <div class="status-name">広告配信</div>
+                <div class="status-desc">Pal-Ad</div>
+            </div>
+
+            <div class="status-item">
+                <div class="status-icon" role="img" aria-label="動画制作を表すステータスアイコン">🎥</div>
+                <div class="status-name">動画制作</div>
+                <div class="status-desc">Pal-Video</div>
+            </div>
+        </section>
+
+        <section class="ai-chat-section">
+            <div class="ai-chat-window">
+                <div class="chat-header">
+                    <div class="ai-robot-icon">🤖</div>
+                    <div class="ai-name">
+                        <h2>AIアシスタント</h2>
+                        <p>● あなたのお店を分析中</p>
+                    </div>
+                </div>
+                
+                <div class="chat-body">
+                    <div class="message ai">
+                        <div class="bubble">
+                            おはようございます！<br>
+                            昨日はホームページ（<strong>Pal-Studio</strong>）へのアクセスが、先週より<strong>20%</strong>も増えていましたよ！すごいですね！✨<br><br>
+                            ただ、広告（<strong>Pal-Ad</strong>）の費用が少し高くなっているみたいです。どうしますか？
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" placeholder="AIに相談したいことを入力してください...">
+                    <button class="send-btn">送信</button>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <div class="action-card" style="border-left: 5px solid var(--color-magenta);">
+                    <h3>📈 運用の成果を見る</h3>
+                    <p>SNSやSEOがうまくいっているか確認します。</p>
+                </div>
+                <div class="action-card" style="border-left: 5px solid var(--color-turquoise);">
+                    <h3>💻 ホームページを直す</h3>
+                    <p>お店の情報を最新にします。</p>
+                </div>
+                <div class="action-card" style="border-left: 5px solid #ccc; background: rgba(0,0,0,0.03);">
+                    <h3>➕ 新しいサービスを試す</h3>
+                    <p>集客をもっと強化するための提案を見ます。</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
