@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Users, Bell, BarChart3, LogOut } from 'lucide-react';
+import { Users, Bell, BarChart3, LogOut, Activity } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/admin', label: '顧客一覧', icon: Users },
+  { href: '/admin/ga-settings', label: 'GA/SC設定', icon: Activity },
   { href: '/admin/line-settings', label: 'LINE通知設定', icon: Bell },
   { href: '/admin/analytics', label: '全体分析', icon: BarChart3 },
 ];
