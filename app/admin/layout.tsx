@@ -20,17 +20,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .then((r) => r.json())
       .then((data) => {
         if (!data.authenticated || data.role !== 'admin') {
-          router.replace('/login');
+          router.replace('/admin/login');
         } else {
           setAuthenticated(true);
         }
       })
-      .catch(() => router.replace('/login'));
+      .catch(() => router.replace('/admin/login'));
   }, [router]);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
-    router.replace('/login');
+    router.replace('/admin/login');
   };
 
   if (!authenticated) {

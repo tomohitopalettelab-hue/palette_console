@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function CustomerLoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
@@ -18,14 +18,14 @@ export default function CustomerLoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ loginId, password, mode: 'customer' }),
+        body: JSON.stringify({ loginId, password, mode: 'admin' }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'ログインに失敗しました');
         return;
       }
-      router.push('/main');
+      router.push('/admin');
     } catch {
       setError('通信エラーが発生しました');
     } finally {
@@ -40,24 +40,22 @@ export default function CustomerLoginPage() {
           <h1 className="text-3xl font-bold tracking-wider" style={{ color: 'var(--text-primary)' }}>
             PALETTE<span className="font-light ml-2">CONSOLE</span>
           </h1>
-          <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>サービス統合ダッシュボード</p>
+          <p className="mt-1 text-xs px-3 py-1 rounded inline-block" style={{ background: 'var(--health-red-bg)', color: 'var(--health-red)' }}>
+            管理者ログイン
+          </p>
         </div>
 
         <div className="glass-card p-8">
-          <h2 className="text-base font-semibold mb-6 text-center" style={{ color: 'var(--text-primary)' }}>
-            ログイン
-          </h2>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>ログインID</label>
+              <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>管理者ID</label>
               <input
                 type="text"
                 value={loginId}
                 onChange={(e) => setLoginId(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-colors"
                 style={{ background: 'var(--bg-input)', color: 'var(--text-primary)', border: '1px solid var(--border-primary)' }}
-                placeholder="ID を入力"
+                placeholder="管理者ID を入力"
                 required
               />
             </div>
