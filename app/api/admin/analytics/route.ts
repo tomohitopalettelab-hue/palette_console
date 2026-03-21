@@ -108,8 +108,8 @@ export async function GET(req: NextRequest) {
     );
 
     const customerKpis = kpiResults
-      .filter((r): r is PromiseFulfilledResult<{ paletteId: string; name: string; industry: string | null; kpis: unknown[] }> => r.status === 'fulfilled')
-      .map((r) => r.value);
+      .filter((r) => r.status === 'fulfilled')
+      .map((r) => (r as PromiseFulfilledResult<{ paletteId: string; name: string; industry: string | null; kpis: Record<string, unknown>[] }>).value);
 
     // Health overview
     let greenCount = 0, yellowCount = 0, redCount = 0;
