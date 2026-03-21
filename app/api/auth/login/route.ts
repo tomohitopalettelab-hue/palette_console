@@ -25,13 +25,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Customer login via pal_db
-    const dbRes = await palDbPost('/api/accounts/chat-login', { loginId, password });
-    if (!dbRes.ok) {
+    const dbRes = await palDbPost('/api/verify-chat-login', { id: loginId, password });
+    const dbBody = await dbRes.json().catch(() => ({}));
+    if (!dbRes.ok || !dbBody?.success) {
       return NextResponse.json({ error: 'ログインIDまたはパスワードが間違っています' }, { status: 401 });
     }
-    const account = await dbRes.json();
-    const paletteId = account.paletteId || account.palette_id || '';
-    const customerId = account.id || '';
+    const paletteId = dbBody.paletteId || '';
+    const customerId = dbBody.accountId || '';
 
     // Check if the customer has a palette_console contract (via palette-summary)
     try {
