@@ -12,16 +12,28 @@ export async function GET(req: NextRequest) {
   const paletteId = session.paletteId;
 
   try {
-    // Fetch subscribed services from pal_db
-    const subsRes = await palDbGet(`/api/service-subscriptions?paletteId=${paletteId}`);
+    // Fetch contracts + plans via palette-summary
+    const summaryRes = await palDbGet(`/api/palette-summary?paletteId=${paletteId}`);
     let subscribedServices: string[] = [];
-    if (subsRes.ok) {
-      const subsData = await subsRes.json();
-      const subs = Array.isArray(subsData) ? subsData : subsData.subscriptions || [];
-      subscribedServices = subs
-        .filter((s: Record<string, unknown>) => s.status === 'active')
-        .map((s: Record<string, unknown>) => String(s.service_key || s.serviceKey || ''))
-        .filter((k: string) => k && k !== 'palette_ai');
+
+    if (summaryRes.ok) {
+      const summary = await summaryRes.json();
+      const contracts = summary.contracts || [];
+      const plans = summary.plans || [];
+
+      const planCodeMap = new Map<string, string>();
+      plans.forEach((p: Record<string, unknown>) => planCodeMap.set(String(p.id || ''), String(p.code || '')));
+
+      // Extract unique base service keys from contracted plans
+      const serviceSet = new Set<string>();
+      contracts.forEach((c: Record<string, unknown>) => {
+        const code = planCodeMap.get(String(c.planId || c.plan_id || '')) || '';
+        if (!code || code === 'palette_console') return;
+        // Normalize: pal_studio_standard -> pal_studio
+        const base = code.replace(/_(lite|standard|pro)$/i, '');
+        serviceSet.add(base);
+      });
+      subscribedServices = [...serviceSet];
     }
 
     // Fetch KPIs from all subscribed services
