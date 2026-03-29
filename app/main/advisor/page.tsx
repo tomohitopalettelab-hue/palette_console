@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Sparkles, AlertCircle, AlertTriangle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
 
 type Action = {
@@ -32,9 +33,14 @@ const PRIORITY_CONFIG = {
 };
 
 export default function AdvisorPage() {
+  const router = useRouter();
   const [data, setData] = useState<AdvisorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const navigateToService = (serviceKey: string) => {
+    router.push(`/main/services?open=${serviceKey}`);
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -131,7 +137,8 @@ export default function AdvisorPage() {
                           <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{action.description}</p>
                         </div>
                         <button
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ml-4 whitespace-nowrap"
+                          onClick={() => navigateToService(action.service)}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ml-4 whitespace-nowrap cursor-pointer hover:opacity-80"
                           style={{ background: config.bg, color: config.color }}
                         >
                           {action.actionLabel}
